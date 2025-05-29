@@ -4,7 +4,7 @@ import { Textarea } from "@heroui/input";
 import { Button } from "@heroui/button";
 import { useState } from "react";
 
-export const DomainGenerator = () => {
+export const DomainGenerator = () => {  
   const nameTypes = [
     {
       key: "brandable",
@@ -38,11 +38,56 @@ export const DomainGenerator = () => {
 
   const [selectedNameType, setSelectedNameType] = useState("brandable");
   const [selectedTlds, setSelectedTlds] = useState([".com"]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const toggleTld = (tld: string) => {
     setSelectedTlds((prev) =>
       prev.includes(tld) ? prev.filter((x) => x !== tld) : [...prev, tld]
     );
+  };
+
+  // Helper: Build prompt for Gemini
+  const buildPrompt = () => {
+    return `Generate 10 creative, available domain names as a JSON array.\n
+Description: ${input}\nName type: ${nameTypes.find(t => t.key === selectedNameType)?.title}\nTLDs: ${selectedTlds.join(", ")}\n
+For each domain, check if it is available (not registered) and return an array of objects with { domain: string, available: boolean }. Only include available domains.\n
+Example response:\n[
+  { "domain": "myaiapp.com", "available": true },
+  { "domain": "smartaiplanner.io", "available": true }
+]`;
+  };
+
+  const handleGenerate = async () => {
+    setLoading(true);
+    setError(null);
+    setResults([]);
+    try {
+      const prompt = buildPrompt();
+      const res = await fetch('/api/generate-domains', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'API error');
+      let domains = [];
+      try {
+        if (!data.text) throw new Error('No response from AI');
+        domains = JSON.parse(data.text);
+      } catch (e) {
+        setError('Could not parse AI response. Try again.');
+        setLoading(false);
+        return;
+      }
+      setResults(domains);
+    } catch (e: any) {
+      setError(e.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,6 +106,8 @@ export const DomainGenerator = () => {
         </div>
         
         <Textarea
+          value={input}
+          onChange={e => setInput(e.target.value)}
           placeholder="💡 Describe your idea or keywords"
           className="w-full max-w-lg mb-5 rounded-xl border-2 border-blue-400/60 bg-white/10 text-white placeholder:text-blue-200 focus:ring-2 focus:ring-blue-400 focus:border-blue-500 shadow-lg transition-all duration-200 font-mono text-lg"
           rows={4}
@@ -114,14 +161,43 @@ export const DomainGenerator = () => {
           <Button
             className="w-full max-w-lg py-3 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-200 border-none"
             color="primary"
+            onClick={handleGenerate}
+            disabled={loading || !input.trim()}
           >
             <span className="flex items-center gap-2">
-              <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M12 19V6M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Generate Domains
+              {loading ? (
+                <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M12 19V6M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+              {loading ? "Generating..." : "Generate Domains"}
             </span>
           </Button>
+        </div>
+
+        {/* Results */}
+        <div className="w-full mt-8">
+          {error && <div className="text-red-400 text-center mb-4">{error}</div>}
+          {results.length > 0 && (
+            <div className="grid grid-cols-1 gap-3">
+              {results.map((item, idx) => (
+                <div key={item.domain + idx} className={`flex items-center justify-between px-4 py-3 rounded-xl border-2 shadow-md font-mono text-lg transition-all
+                  ${item.available ? "border-green-400 bg-green-900/30 text-green-200" : "border-red-400 bg-red-900/30 text-red-200"}
+                `}>
+                  <span>{item.domain}</span>
+                  <span className={`ml-4 px-2 py-1 rounded text-xs font-bold
+                    ${item.available ? "bg-green-500/80 text-white" : "bg-red-500/80 text-white"}
+                  `}>
+                    {item.available ? "Available" : "Taken"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
