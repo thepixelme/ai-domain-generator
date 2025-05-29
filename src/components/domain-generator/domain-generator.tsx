@@ -1,3 +1,14 @@
+/**
+ * DomainGenerator React component
+ *
+ * Provides a beautiful UI for generating creative, available domain names using Google Gemini AI.
+ * Users can describe their idea, select a name type and TLDs, and receive AI-generated, available domain suggestions.
+ *
+ * The component sends a prompt to a secure Next.js API route, which calls Gemini and returns results.
+ *
+ * - All AI and API key logic is handled server-side for security.
+ * - Results are parsed and displayed in a styled, modern interface.
+ */
 'use client';
 
 import { Textarea } from "@heroui/input";
@@ -54,12 +65,15 @@ export const DomainGenerator = () => {
     return `Generate 10 creative, available domain names as a JSON array.\n
 Description: ${input}\nName type: ${nameTypes.find(t => t.key === selectedNameType)?.title}\nTLDs: ${selectedTlds.join(", ")}\n
 For each domain, check if it is available (not registered) and return an array of objects with { domain: string, available: boolean }. Only include available domains.\n
-Example response:\n[
-  { "domain": "myaiapp.com", "available": true },
-  { "domain": "smartaiplanner.io", "available": true }
-]`;
+Example response:\n[\n  { \"domain\": \"myaiapp.com\", \"available\": true },\n  { \"domain\": \"smartaiplanner.io\", \"available\": true }\n]`;
   };
 
+  /**
+   * Handles the domain generation process:
+   * - Builds the prompt
+   * - Calls the secure API route
+   * - Parses and displays results or errors
+   */
   const handleGenerate = async () => {
     setLoading(true);
     setError(null);
