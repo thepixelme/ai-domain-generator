@@ -106,7 +106,7 @@ Example response:\n[\n  { "domain": "myaiapp.com" },\n  { "domain": "smartaiplan
           const ideas = JSON.parse(data.text);
           domains = ideas.map((item: any) => ({ domain: item.domain, available: true }));
         }
-      } catch (e) {
+      } catch {
         setError('Could not parse API response. Try again.');
         setLoading(false);
         return;
