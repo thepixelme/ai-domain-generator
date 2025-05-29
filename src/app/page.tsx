@@ -1,4 +1,4 @@
-import { DomainGenerator } from "@/components/domain-generator";
+import { DomainGenerator } from "@/components/generator";
 
 export default function Home() {
   return (

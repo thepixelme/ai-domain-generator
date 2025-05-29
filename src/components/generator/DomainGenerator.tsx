@@ -65,10 +65,15 @@ export const DomainGenerator = () => {
 
   // Helper: Build prompt for Gemini
   const buildPrompt = () => {
-    return `Generate 10 creative, available domain names as a JSON array.\n
-Description: ${input}\nName type: ${nameTypes.find(t => t.key === selectedNameType)?.title}\nTLDs: ${selectedTlds.join(", ")}\n
-For each domain, check if it is available (not registered) and return an array of objects with { domain: string, available: boolean }. Only include available domains.\n
-Example response:\n[\n  { \"domain\": \"myaiapp.com\", \"available\": true },\n  { \"domain\": \"smartaiplanner.io\", \"available\": true }\n]`;
+    return `Generate 10 creative domain name ideas as a JSON array of objects, without checking availability.
+
+Description: ${input}
+Name type: ${nameTypes.find(t => t.key === selectedNameType)?.title} (Generate names that fit this style. For example: ${nameTypes.find(t => t.key === selectedNameType)?.example})
+TLDs: ${selectedTlds.join(", ")} (Each domain name should use one of these TLDs.)
+
+Return an array of objects with this format: { domain: string }.
+
+Example response:\n[\n  { "domain": "myaiapp.com" },\n  { "domain": "smartaiplanner.io" }\n]`;
   };
 
   /**
@@ -92,8 +97,15 @@ Example response:\n[\n  { \"domain\": \"myaiapp.com\", \"available\": true },\n 
       if (!res.ok) throw new Error(data.error || 'API error');
       let domains = [];
       try {
-        if (!data.domains) throw new Error('No response from API');
-        domains = data.domains;
+        if (!data.domains && !data.text) throw new Error('No response from API');
+        // If the backend returns domains (after Domainr check), use that
+        if (data.domains) {
+          domains = data.domains;
+        } else {
+          // Fallback: parse Gemini's raw text (for dev/testing)
+          const ideas = JSON.parse(data.text);
+          domains = ideas.map((item: any) => ({ domain: item.domain, available: true }));
+        }
       } catch (e) {
         setError('Could not parse API response. Try again.');
         setLoading(false);

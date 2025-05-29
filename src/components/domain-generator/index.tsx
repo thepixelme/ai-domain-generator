@@ -1,1 +1,0 @@
-export { DomainGenerator } from "./domain-generator";

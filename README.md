@@ -7,7 +7,9 @@ A web app that utilize Google Gemini to generate creative domain names and insta
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-First, rename `.example.env` to `.env`. Then, visit [https://aistudio.google.com/apikey](https://aistudio.google.com/apikey) to get your own Google Gemini API key.
+First, rename `.example.env` to `.env`:
+- visit [https://aistudio.google.com/apikey](https://aistudio.google.com/apikey) to get your own Google Gemini API key.
+- visit [https://domainr.com/docs/api](https://domainr.com/docs/api) to get your own Domainr (via RapidAPI at this point).
 
 Second, run `npm install`.
 

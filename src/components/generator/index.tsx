@@ -1,0 +1,1 @@
+export { DomainGenerator } from "./DomainGenerator";
