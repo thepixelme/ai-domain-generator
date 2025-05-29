@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // Initialize Gemini model (text-only, fast version)
-    const gemini = google('gemini-2.0-flash');
+    const gemini = google('gemini-2.5-flash-preview-05-20');
     const response = await gemini.doGenerate({
       inputFormat: 'messages',
       mode: { type: 'regular' },
