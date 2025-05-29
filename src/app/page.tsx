@@ -1,13 +1,11 @@
-import Image from "next/image";
-import { Button } from "@heroui/button";
-
 import { SiteHeader } from "@/components/header";
+import { DomainGenerator } from "@/components/domain-generator";
 
 export default function Home() {
   return (
     <div>
       <SiteHeader />
-      <Button color="primary">Button</Button>
+      <DomainGenerator />
     </div>
   );
 }
