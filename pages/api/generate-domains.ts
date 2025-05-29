@@ -38,7 +38,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let json = response.text || '';
     const match = json.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
     if (match) json = match[1];
-    res.status(200).json({ text: json });
+    let ideas;
+    try {
+      ideas = JSON.parse(json);
+    } catch {
+      return res.status(500).json({ error: 'AI response could not be parsed as JSON.' });
+    }
+    // Check each domain with Domainr API (RapidAPI)
+    const rapidApiKey = process.env.RAPID_API_KEY_DOMAINR;
+    if (!rapidApiKey) return res.status(500).json({ error: 'Domainr API key not set.' });
+    const checkDomain = async (domain: string) => {
+      const url = `https://domainr.p.rapidapi.com/v2/status?domain=${encodeURIComponent(domain)}`;
+      const resp = await fetch(url, {
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'domainr.p.rapidapi.com',
+        },
+      });
+      const data = await resp.json();
+      // Domainr returns status objects, look for 'active' (taken) or 'undelegated inactive' (available)
+      const status = data.status && data.status[0] && data.status[0].status;
+      // If status includes 'inactive' or 'undelegated', it's available
+      const available = status && (status.includes('inactive') || status.includes('undelegated'));
+      return available;
+    };
+    // ideas is an array of { domain: string, ... }
+    const checked = await Promise.all(
+      ideas.map(async (item: any) => {
+        const available = await checkDomain(item.domain);
+        return { ...item, available };
+      })
+    );
+    res.status(200).json({ domains: checked });
   } catch (e: any) {
     // Return error details to client
     res.status(500).json({ error: e.message || 'Something went wrong' });
