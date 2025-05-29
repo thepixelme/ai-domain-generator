@@ -151,22 +151,22 @@ Example response:\n[\n  { "domain": "myaiapp.com" },\n  { "domain": "smartaiplan
         />
         <div className="w-full flex justify-center">
           <Button
-            className="w-full max-w-lg py-3 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-200 border-none"
+            className={`w-full max-w-lg py-3 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-200 border-none relative overflow-hidden ${loading ? 'animate-pulse bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700' : ''}`}
             color="primary"
             onClick={handleGenerate}
             disabled={loading || !input.trim()}
           >
-            <span className="flex items-center gap-2">
-              {loading ? (
-                <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M12 19V6M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              )}
-              {loading ? "Generating..." : "Generate Domains"}
+            {loading && (
+              <span className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <span className="w-6 h-6 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mr-2"></span>
+                <span className="text-blue-100 font-semibold animate-pulse">Generating...</span>
+              </span>
+            )}
+            <span className={`flex items-center gap-2 ${loading ? 'opacity-0' : 'opacity-100'}`}>
+              <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M12 19V6M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Generate Domains
             </span>
           </Button>
         </div>
