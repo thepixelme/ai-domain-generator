@@ -31,9 +31,11 @@ export const DomainGenerator = () => {
       example: "Examples: Lyft, Fiverr, Dribbble",
     },
   ];
+
   const tldOptions = [
     ".com", ".org", ".ai", ".io", ".app", ".co", ".net", ".dev", ".me", ".tech", ".site", ".xyz"
   ];
+
   const [selectedNameType, setSelectedNameType] = useState("brandable");
   const [selectedTlds, setSelectedTlds] = useState([".com"]);
 
@@ -88,7 +90,7 @@ export const DomainGenerator = () => {
         </div>
 
         {/* TLD Selection */}
-        <div className="w-full mb-6">
+        <div className="w-full mb-8">
           <div className="text-white font-semibold mb-2 text-lg">TLDs</div>
           <div className="flex flex-wrap gap-2">
             {tldOptions.map((tld) => (
@@ -107,20 +109,19 @@ export const DomainGenerator = () => {
             ))}
           </div>
         </div>
-
-        <Button
-          className="w-full max-w-lg py-3 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-200 border-none"
-          color="primary"
-        >
-          <span className="flex items-center gap-2">
-            <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path d="M12 19V6M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            Generate Domains
-          </span>
-        </Button>
-        <div className="mt-6 text-xs text-white/50 text-center">
-          Powered by AI. Enter a description and get creative, available domain ideas instantly!
+        
+        <div className="w-full flex justify-center">
+          <Button
+            className="w-full max-w-lg py-3 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-200 border-none"
+            color="primary"
+          >
+            <span className="flex items-center gap-2">
+              <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M12 19V6M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Generate Domains
+            </span>
+          </Button>
         </div>
       </div>
     </div>
